@@ -6,6 +6,17 @@ from stock_info import get_stock_info
 DB_PATH = "./users.db"
 from gemini_helper import ask_gemini  # 新增這行
 
+from linebot.models import QuickReply, QuickReplyButton, MessageAction
+
+def get_quick_reply():
+    return QuickReply(items=[
+        QuickReplyButton(action=MessageAction(label="查詢 2330", text="查詢 2330")),
+        QuickReplyButton(action=MessageAction(label="新增 2330", text="新增 2330")),
+        QuickReplyButton(action=MessageAction(label="刪除 2330", text="刪除 2330")),
+        QuickReplyButton(action=MessageAction(label="清單", text="清單")),
+        QuickReplyButton(action=MessageAction(label="查詢清單", text="查詢清單")),
+        QuickReplyButton(action=MessageAction(label="新聞", text="新聞")),
+    ])
 
 def get_help_message():
     return (
@@ -82,13 +93,19 @@ def handle_line_message(user_id, message, reply_token, line_bot_api):
         stock_id = message[2:].strip()
         success, reply_text = add_stock(user_id, stock_id)
         reply_text += get_help_message()
-        line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_text))
+        line_bot_api.reply_message(reply_token, TextSendMessage(
+            text=reply_text,
+            quick_reply=get_quick_reply()
+        ))
 
     elif message.startswith("刪除"):
         stock_id = message[2:].strip()
         success, reply_text = remove_stock(user_id, stock_id)
         reply_text += get_help_message()
-        line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_text))
+        line_bot_api.reply_message(reply_token, TextSendMessage(
+            text=reply_text,
+            quick_reply=get_quick_reply()
+        ))
 
     elif message == "清單":
         stocks = get_user_stocks(user_id)
@@ -97,13 +114,19 @@ def handle_line_message(user_id, message, reply_token, line_bot_api):
         else:
             reply_text = "你關注的股票有：\n" + "\n".join(stocks)
         reply_text += get_help_message()
-        line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_text))
+        line_bot_api.reply_message(reply_token, TextSendMessage(
+            text=reply_text,
+            quick_reply=get_quick_reply()
+        ))
 
     elif message == "查詢清單":
         stocks = get_user_stocks(user_id)
         if not stocks:
             reply_text = "你尚未關注任何股票。" + get_help_message()
-            line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_text))
+            line_bot_api.reply_message(reply_token, TextSendMessage(
+                text=reply_text,
+                quick_reply=get_quick_reply()
+            ))
             return
         
         reply_texts = []
@@ -111,9 +134,8 @@ def handle_line_message(user_id, message, reply_token, line_bot_api):
             info, error = get_stock_info(stock_id)
             reply_texts.append(info if info else f"{stock_id} 查詢失敗：{error}")
         
-        # 附上功能提示
         reply_texts.append(get_help_message())
-        messages = [TextSendMessage(text=text) for text in reply_texts[:5]]
+        messages = [TextSendMessage(text=text, quick_reply=get_quick_reply()) for text in reply_texts[:5]]
         line_bot_api.reply_message(reply_token, messages)
 
     elif message == "新聞":
@@ -121,7 +143,10 @@ def handle_line_message(user_id, message, reply_token, line_bot_api):
         if not stocks:
             reply_text = "你還沒有關注任何股票，請先使用「新增 股票代號」加入。"
             reply_text += get_help_message()
-            line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_text))
+            line_bot_api.reply_message(reply_token, TextSendMessage(
+                text=reply_text,
+                quick_reply=get_quick_reply()
+            ))
         else:
             result_lines = ["📰 你的股票新聞推薦："]
             for stock_id in stocks:
@@ -132,7 +157,10 @@ def handle_line_message(user_id, message, reply_token, line_bot_api):
                     result_lines.append(f"{stock_id}：找不到相關新聞。")
             result_lines.append(get_help_message())
             reply_text = "\n\n".join(result_lines)
-            line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_text))
+            line_bot_api.reply_message(reply_token, TextSendMessage(
+                text=reply_text,
+                quick_reply=get_quick_reply()
+            ))
 
     elif message.startswith("查詢 ") and len(message.split()) == 2:
         stock_id = message.split()[1]
@@ -142,11 +170,16 @@ def handle_line_message(user_id, message, reply_token, line_bot_api):
         else:
             reply_text = "請輸入正確的 4~6 碼股票代號，如：查詢 2330"
         reply_text += get_help_message()
-        line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_text))
+        line_bot_api.reply_message(reply_token, TextSendMessage(
+            text=reply_text,
+            quick_reply=get_quick_reply()
+        ))
 
     else:
         # Gemini 問答處理
         reply_text = ask_gemini(message)
         reply_text += get_help_message()
-        line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_text))
-
+        line_bot_api.reply_message(reply_token, TextSendMessage(
+            text=reply_text,
+            quick_reply=get_quick_reply()
+        ))
