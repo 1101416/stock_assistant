@@ -6,6 +6,19 @@ from stock_info import get_stock_info
 DB_PATH = "./users.db"
 from gemini_helper import ask_gemini  # 新增這行
 
+
+def get_help_message():
+    return (
+        "\n\n🤖 指令提示：\n"
+        "📈 查股價：查詢 2330\n"
+        "🧾 關注股票：新增 2330\n"
+        "❌ 移除關注：刪除 2330\n"
+        "📋 查看關注清單：清單\n"
+        "🔎 批次查詢清單股價：查詢清單\n"
+        "📰 查詢新聞：新聞\n"
+        "🤖 問 AI：直接輸入問題，例如『台積電是做什麼的？』"
+    )
+
 # 初始化資料庫（第一次使用可呼叫）
 def init_db():
     conn = sqlite3.connect(DB_PATH)
@@ -68,31 +81,38 @@ def handle_line_message(user_id, message, reply_token, line_bot_api):
     if message.startswith("新增"):
         stock_id = message[2:].strip()
         success, reply_text = add_stock(user_id, stock_id)
+        reply_text += get_help_message()
         line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_text))
+
     elif message.startswith("刪除"):
         stock_id = message[2:].strip()
         success, reply_text = remove_stock(user_id, stock_id)
+        reply_text += get_help_message()
         line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_text))
+
     elif message == "清單":
         stocks = get_user_stocks(user_id)
         if not stocks:
             reply_text = "你還沒有關注任何股票。"
         else:
             reply_text = "你關注的股票有：\n" + "\n".join(stocks)
+        reply_text += get_help_message()
         line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_text))
-        
+
     elif message == "查詢清單":
         stocks = get_user_stocks(user_id)
         if not stocks:
-            line_bot_api.reply_message(reply_token, TextSendMessage(text="你尚未關注任何股票。"))
+            reply_text = "你尚未關注任何股票。" + get_help_message()
+            line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_text))
             return
         
         reply_texts = []
         for stock_id in stocks:
             info, error = get_stock_info(stock_id)
             reply_texts.append(info if info else f"{stock_id} 查詢失敗：{error}")
-
-        # LINE 最多一次只能回傳 5 則訊息（也就是 5 則 TextSendMessage）
+        
+        # 附上功能提示
+        reply_texts.append(get_help_message())
         messages = [TextSendMessage(text=text) for text in reply_texts[:5]]
         line_bot_api.reply_message(reply_token, messages)
 
@@ -100,6 +120,7 @@ def handle_line_message(user_id, message, reply_token, line_bot_api):
         stocks = get_user_stocks(user_id)
         if not stocks:
             reply_text = "你還沒有關注任何股票，請先使用「新增 股票代號」加入。"
+            reply_text += get_help_message()
             line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_text))
         else:
             result_lines = ["📰 你的股票新聞推薦："]
@@ -109,19 +130,23 @@ def handle_line_message(user_id, message, reply_token, line_bot_api):
                     result_lines.append(f"{title}\n{link}")
                 else:
                     result_lines.append(f"{stock_id}：找不到相關新聞。")
+            result_lines.append(get_help_message())
             reply_text = "\n\n".join(result_lines)
             line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_text))
 
-
     elif message.startswith("查詢 ") and len(message.split()) == 2:
         stock_id = message.split()[1]
-        if stock_id.isdigit() and len(stock_id) >= 4 and len(stock_id) <= 6:
+        if stock_id.isdigit() and 4 <= len(stock_id) <= 6:
             info, error = get_stock_info(stock_id)
             reply_text = info if info else error
-            line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_text))
         else:
-            line_bot_api.reply_message(reply_token, TextSendMessage(text="請輸入正確的 4~6 碼股票代號，如：查詢 2330"))
+            reply_text = "請輸入正確的 4~6 碼股票代號，如：查詢 2330"
+        reply_text += get_help_message()
+        line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_text))
+
     else:
-        # ⭐ 預設為 Gemini 問答處理
+        # Gemini 問答處理
         reply_text = ask_gemini(message)
-    line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_text))
+        reply_text += get_help_message()
+        line_bot_api.reply_message(reply_token, TextSendMessage(text=reply_text))
+
