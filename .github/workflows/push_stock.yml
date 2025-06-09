@@ -7,10 +7,15 @@ on:
   workflow_dispatch:       # 可手動觸發
 
 jobs:
-  call-push-api:
+  notify:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Call LINE Bot push_stock API
-        run: |
-          curl -X POST https://你的render子網域.onrender.com/push_stock
+      - name: Wake up Render app
+        run: curl https://your-app.onrender.com/
+
+      - name: Wait for 60 seconds
+        run: sleep 60
+
+      - name: Trigger Push Notification
+        run: curl -X POST https://your-app.onrender.com/push-stocks
