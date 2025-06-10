@@ -4,13 +4,13 @@ from news_scraper import fetch_stock_news
 from linebot.models import TextSendMessage
 from stock_info import get_stock_info
 DB_PATH = "./users.db"
-from gemini_helper import ask_gemini  # 新增這行
+from gemini_helper import ask_gemini
 
 from linebot.models import QuickReply, QuickReplyButton, MessageAction
 
 def get_quick_reply():
     return QuickReply(items=[
-        QuickReplyButton(action=MessageAction(label="查詢 2330", text="查詢 2330")),
+        QuickReplyButton(action=MessageAction(label="查詢股票", text="請輸入：查詢 股票代號（如：查詢 2330）")),
         QuickReplyButton(action=MessageAction(label="新增 2330", text="新增 2330")),
         QuickReplyButton(action=MessageAction(label="刪除 2330", text="刪除 2330")),
         QuickReplyButton(action=MessageAction(label="清單", text="清單")),
@@ -20,13 +20,13 @@ def get_quick_reply():
 
 def get_help_message():
     return (
-        "\n\n🤖 指令提示：\n"
-        "📈 查股價：查詢 2330\n"
-        "🧾 關注股票：新增 2330\n"
-        "❌ 移除關注：刪除 2330\n"
+        "🤖 指令提示：\n"
+        "📈 查股價：查詢 2330(股票代號)\n"
+        "🧾 關注股票：新增 2330(股票代號)\n"
+        "❌ 移除關注：刪除 2330(股票代號)\n"
         "📋 查看關注清單：清單\n"
-        "🔎 批次查詢清單股價：查詢清單\n"
-        "📰 查詢新聞：新聞\n"
+        "🔎 批次查詢清單股價：查詢清單(須先建立清單)\n"
+        "📰 查詢新聞：新聞(須先建立清單)\n"
         "🤖 問 AI：直接輸入問題，例如『台積電是做什麼的？』"
     )
 
