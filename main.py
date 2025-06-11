@@ -50,6 +50,7 @@ def handle_text_message(event):
 @app.route("/push_stock", methods=["POST"])
 def push_stock_job():
     def get_all_user_ids():
+        print(f"📥 push_stock 使用資料庫：{DB_PATH}")
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         c.execute("SELECT DISTINCT user_id FROM user_stocks")
