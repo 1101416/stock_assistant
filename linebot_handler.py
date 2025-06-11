@@ -1,4 +1,5 @@
 import sqlite3
+import os
 from linebot.models import TextSendMessage
 from news_scraper import fetch_stock_news
 from linebot.models import TextSendMessage
@@ -32,19 +33,26 @@ def get_help_message():
 
 # 初始化資料庫（第一次使用可呼叫）
 def init_db():
-    print(f"📦 初始化資料庫位置：{DB_PATH}")
+    is_new_db = not os.path.exists(DB_PATH)
+    print(f"📦 資料庫路徑：{DB_PATH}（{'新建' if is_new_db else '已存在'}）")
+
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS user_stocks (
-            user_id TEXT,
-            stock_id TEXT,
-            PRIMARY KEY (user_id, stock_id)
-        )
-    """)
-    conn.commit()
-    conn.close()
-    print("✅ user_stocks 資料表建立完成")
+
+    try:
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS user_stocks (
+                user_id TEXT NOT NULL,
+                stock_id TEXT NOT NULL,
+                PRIMARY KEY (user_id, stock_id)
+            )
+        ''')
+        conn.commit()
+        print("✅ 資料表 user_stocks 確認建立完成")
+    except Exception as e:
+        print(f"❌ 建立資料表失敗：{e}")
+    finally:
+        conn.close()
 
 
 # 查詢使用者關注清單
