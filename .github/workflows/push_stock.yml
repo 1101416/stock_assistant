@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - name: Wake up Render app
-        run: curl https://your-app.onrender.com/
+        run: curl https://stock-assistant-s63m.onrender.com
 
       - name: Wait for 60 seconds
         run: sleep 60
 
       - name: Trigger Push Notification
-        run: curl -X POST https://your-app.onrender.com/push_stock
+        run: curl -X POST https://stock-assistant-s63m.onrender.com/push_stock
