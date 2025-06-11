@@ -4,7 +4,7 @@ from linebot.models import TextSendMessage
 from news_scraper import fetch_stock_news
 from linebot.models import TextSendMessage
 from stock_info import get_stock_info
-DB_PATH = "./users.db"
+DB_PATH = "./line_gemini.db"
 from gemini_helper import ask_gemini
 
 from linebot.models import QuickReply, QuickReplyButton, MessageAction
