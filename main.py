@@ -82,4 +82,5 @@ def push_stock_job():
 
 # 📍 主程式進入點（Render 啟動）
 if __name__ == "__main__":
+    init_db()  
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
