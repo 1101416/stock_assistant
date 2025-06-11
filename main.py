@@ -49,6 +49,7 @@ def handle_text_message(event):
 # 📍 GitHub Actions 專用：定時推播 API
 @app.route("/push_stock", methods=["POST"])
 def push_stock_job():
+    init_db() 
     def get_all_user_ids():
         print(f"📥 push_stock 使用資料庫：{DB_PATH}")
         conn = sqlite3.connect(DB_PATH)
