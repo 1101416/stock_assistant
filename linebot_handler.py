@@ -11,7 +11,7 @@ from linebot.models import QuickReply, QuickReplyButton, MessageAction
 
 def get_quick_reply():
     return QuickReply(items=[
-        QuickReplyButton(action=MessageAction(label="查詢股票", text="請輸入：查詢 股票代號（如：查詢 2330）")),
+        QuickReplyButton(action=MessageAction(label="查詢 2330", text="查詢 2330")),
         QuickReplyButton(action=MessageAction(label="新增 2330", text="新增 2330")),
         QuickReplyButton(action=MessageAction(label="刪除 2330", text="刪除 2330")),
         QuickReplyButton(action=MessageAction(label="清單", text="清單")),
