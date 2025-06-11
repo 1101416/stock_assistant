@@ -20,7 +20,13 @@ def get_stock_info(stock_id):
         name = name_tag.text.strip() if name_tag else "N/A"
 
         # 擷取現價
-        rice_tag = soup.find("h3", class_=re.compile(r"^jsx-2312976322(?: (fall|rise))?$"))
+        valid_classes = [
+            "jsx-2312976322",
+            "jsx-2312976322 fall",
+            "jsx-2312976322 rise"
+        ]
+        
+        price_tag = soup.find("h3", attrs={"class": lambda c: c in valid_classes})
         price = price_tag.text.strip() if price_tag else "N/A"
 
         change_tag = soup.find("div", class_="jsx-2312976322 first-row")
