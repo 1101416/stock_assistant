@@ -14,7 +14,7 @@ from stock_manager import get_user_stocks
 
 # 載入環境變數
 load_dotenv()
-
+init_db() 
 # 初始化 Flask 與 LINE Bot API
 app = Flask(__name__)
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
@@ -79,8 +79,6 @@ def push_stock_job():
 
     return "✅ 推播完成", 200
 
-
-init_db()
 # 📍 主程式進入點（Render 啟動）
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
