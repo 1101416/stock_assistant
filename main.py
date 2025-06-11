@@ -8,7 +8,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 # 自訂模組
-from linebot_handler import handle_line_message, init_db
+from linebot_handler import handle_line_message, init_db, DB_PATH
 from stock_info import get_stock_info
 from stock_manager import get_user_stocks
 
@@ -50,7 +50,7 @@ def handle_text_message(event):
 @app.route("/push_stock", methods=["POST"])
 def push_stock_job():
     def get_all_user_ids():
-        conn = sqlite3.connect("users.db")
+        conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         c.execute("SELECT DISTINCT user_id FROM user_stocks")
         rows = c.fetchall()
