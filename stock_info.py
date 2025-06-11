@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import re
 
 def get_stock_info(stock_id):
     url = f"https://www.cnyes.com/twstock/{stock_id}"
@@ -19,7 +20,7 @@ def get_stock_info(stock_id):
         name = name_tag.text.strip() if name_tag else "N/A"
 
         # 擷取現價
-        price_tag = soup.find("div", class_="jsx-2312976322 price")
+        rice_tag = soup.find("h3", class_=re.compile(r"^jsx-2312976322(?: (fall|rise))?$"))
         price = price_tag.text.strip() if price_tag else "N/A"
 
         change_tag = soup.find("div", class_="jsx-2312976322 first-row")
