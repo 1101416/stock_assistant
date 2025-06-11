@@ -32,6 +32,7 @@ def get_help_message():
 
 # 初始化資料庫（第一次使用可呼叫）
 def init_db():
+    print(f"📦 初始化資料庫位置：{DB_PATH}")
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
@@ -43,6 +44,8 @@ def init_db():
     """)
     conn.commit()
     conn.close()
+    print("✅ user_stocks 資料表建立完成")
+
 
 # 查詢使用者關注清單
 def get_user_stocks(user_id):
