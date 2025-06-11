@@ -10,11 +10,12 @@ from dotenv import load_dotenv
 # 自訂模組
 from linebot_handler import handle_line_message, init_db, DB_PATH
 from stock_info import get_stock_info
-from stock_manager import get_user_stocks
+from stock_manager import get_user_stocks,init_stock_table
 
 # 載入環境變數
 load_dotenv()
 init_db() 
+init_stock_table()
 # 初始化 Flask 與 LINE Bot API
 app = Flask(__name__)
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
